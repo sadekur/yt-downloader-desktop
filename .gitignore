@@ -1,14 +1,29 @@
 # Python virtual environment
 .venv/
+venv/
+env/
 
 # Python cache
 __pycache__/
 *.pyc
+*.pyo
+
+# Packaging / build artifacts (PyInstaller etc.)
+build/
+dist/
+*.spec
+*.egg-info/
 
 # Downloaded videos (output of this tool, not source code)
 downloads/
 
+# Local app config/state (e.g. saved output folder, window prefs)
+*.log
+.env
+
 # OS/editor cruft
 .DS_Store
 *.swp
+.vscode/
+.idea/
 CLAUDE.md
