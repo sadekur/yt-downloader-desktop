@@ -199,4 +199,11 @@ class DownloadWorker(QThread):
             self.failed.emit(str(exc))
             return
 
-        self.finished_ok.emit(filepath)
+        thumbnail_path = _cache_thumbnail(info.get("thumbnail"), info.get("id", ""))
+        result = DownloadResult(
+            title=info.get("title", os.path.basename(filepath)),
+            filepath=filepath,
+            thumbnail_path=thumbnail_path,
+            mode=self.mode,
+        )
+        self.finished_ok.emit(result)
