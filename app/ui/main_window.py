@@ -131,14 +131,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.progress_bar)
 
         self.status_label = QLabel("Ready")
-        self.status_label.setObjectName("statusLabel")
         layout.addWidget(self.status_label)
 
         layout.addStretch(1)
 
     def _build_header(self) -> QFrame:
         header = QFrame()
-        header.setObjectName("headerBar")
         header.setFixedHeight(56)
         header_layout = QHBoxLayout(header)
         header_layout.setContentsMargins(16, 8, 16, 8)
@@ -149,20 +147,21 @@ class MainWindow(QMainWindow):
         header_layout.addWidget(icon_label)
 
         title = QLabel("YT Downloader")
-        title.setObjectName("headerTitle")
+        title_font = QFont()
+        title_font.setPointSize(title_font.pointSize() + 2)
+        title_font.setBold(True)
+        title.setFont(title_font)
         header_layout.addWidget(title)
 
         header_layout.addStretch(1)
 
         self.theme_button = QToolButton()
-        self.theme_button.setObjectName("headerIconButton")
         self.theme_button.setCursor(Qt.PointingHandCursor)
         self.theme_button.setToolTip("Toggle dark mode")
         self.theme_button.clicked.connect(self.on_theme_toggle_clicked)
         header_layout.addWidget(self.theme_button)
 
         settings_button = QToolButton()
-        settings_button.setObjectName("headerIconButton")
         settings_button.setText("⚙")
         settings_button.setCursor(Qt.PointingHandCursor)
         settings_button.setToolTip("Preferences")
@@ -174,7 +173,7 @@ class MainWindow(QMainWindow):
     # -- Theme -------------------------------------------------------------
 
     def _apply_theme(self) -> None:
-        self.setStyleSheet(stylesheet_for(self.dark_mode))
+        apply_theme(QApplication.instance(), self.dark_mode)
         self.theme_button.setText("☀" if self.dark_mode else "☾")
 
     def on_theme_toggle_clicked(self) -> None:
