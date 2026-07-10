@@ -27,6 +27,7 @@ def main() -> None:
     app.setOrganizationName("YTDownloaderDesktop")
     app.setDesktopFileName("yt-downloader-desktop")
     app.setWindowIcon(QIcon(ICON_PATH))
+    apply_theme(app, load_dark_mode())
 
     if args.preferences:
         dialog = PreferencesDialog()
