@@ -112,7 +112,7 @@ app/
   ui/
     main_window.py               # main window / widgets
     preferences_dialog.py        # Preferences dialog (QSettings-backed)
-    theme.py                     # light/dark stylesheets
+    theme.py                     # applies qt-material Material Design themes
   resources/
     icon.png, icon-*.png         # app icon at various sizes
 scripts/
