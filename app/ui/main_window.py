@@ -136,7 +136,35 @@ class MainWindow(QMainWindow):
         self.status_label = QLabel("Ready")
         layout.addWidget(self.status_label)
 
-        layout.addStretch(1)
+        layout.addWidget(self._build_downloads_section())
+
+    def _build_downloads_section(self) -> QWidget:
+        section = QWidget()
+        section_layout = QVBoxLayout(section)
+        section_layout.setContentsMargins(0, 8, 0, 0)
+        section_layout.setSpacing(8)
+
+        header = QLabel("Recent Downloads")
+        header_font = QFont()
+        header_font.setBold(True)
+        header.setFont(header_font)
+        section_layout.addWidget(header)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setMaximumHeight(260)
+        scroll.setFrameShape(QFrame.NoFrame)
+
+        container = QWidget()
+        self.downloads_list_layout = QVBoxLayout(container)
+        self.downloads_list_layout.setContentsMargins(0, 0, 0, 0)
+        self.downloads_list_layout.setSpacing(8)
+        self.downloads_list_layout.addStretch(1)
+        scroll.setWidget(container)
+
+        section_layout.addWidget(scroll)
+        self._refresh_downloads_list(load_history())
+        return section
 
     def _build_header(self) -> QFrame:
         header = QFrame()
