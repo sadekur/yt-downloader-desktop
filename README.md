@@ -1,6 +1,8 @@
 # YT Downloader Desktop
 
-A desktop YouTube downloader built with Python, PySide6 (Qt), and yt-dlp.
+A desktop YouTube downloader built with Python, PySide6 (Qt), yt-dlp, and
+[qt-material](https://github.com/UN-GCPDS/qt-material) for a Material Design
+look (no hand-written stylesheets).
 
 ![YT Downloader icon](app/resources/icon-128.png)
 
