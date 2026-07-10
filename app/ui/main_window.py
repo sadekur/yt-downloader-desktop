@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import os
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
-    QCheckBox,
     QComboBox,
     QFileDialog,
+    QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -15,77 +16,108 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QPushButton,
+    QSizePolicy,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
 from app.core.downloader import DownloadWorker, FetchFormatsWorker, FormatOption
+from app.ui.preferences_dialog import PreferencesDialog, load_dark_mode, load_output_dir, save_dark_mode
 from app.ui.theme import stylesheet_for
 
-DEFAULT_OUTPUT_DIR = os.path.join(os.path.expanduser("~"), "Downloads")
+RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "..", "resources")
+ICON_PATH = os.path.join(RESOURCES_DIR, "icon.png")
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("YT Downloader")
-        self.resize(560, 320)
+        self.setWindowIcon(QIcon(ICON_PATH))
+        self.resize(620, 420)
 
-        self.output_dir = DEFAULT_OUTPUT_DIR
+        self.output_dir = load_output_dir()
+        self.dark_mode = load_dark_mode()
         self.formats: list[FormatOption] = []
         self.fetch_worker: FetchFormatsWorker | None = None
         self.download_worker: DownloadWorker | None = None
 
         self._build_ui()
-        self._apply_theme(dark_mode=False)
+        self._apply_theme()
 
     # -- UI construction -------------------------------------------------
 
     def _build_ui(self) -> None:
         central = QWidget()
         self.setCentralWidget(central)
-        layout = QVBoxLayout(central)
-        layout.setSpacing(10)
+        root = QVBoxLayout(central)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+
+        root.addWidget(self._build_header())
+
+        body = QWidget()
+        layout = QVBoxLayout(body)
+        layout.setContentsMargins(20, 18, 20, 18)
+        layout.setSpacing(14)
+        root.addWidget(body)
 
         # URL row
         url_row = QHBoxLayout()
         self.url_input = QLineEdit()
         self.url_input.setPlaceholderText("Paste YouTube URL here...")
         self.fetch_button = QPushButton("Fetch")
+        self.fetch_button.setObjectName("fetchButton")
+        self.fetch_button.setCursor(Qt.PointingHandCursor)
         self.fetch_button.clicked.connect(self.on_fetch_clicked)
         url_row.addWidget(self.url_input)
         url_row.addWidget(self.fetch_button)
         layout.addLayout(url_row)
 
         self.title_label = QLabel("")
+        self.title_label.setObjectName("titleLabel")
         self.title_label.setWordWrap(True)
         layout.addWidget(self.title_label)
 
-        # Quality row
+        # Options card: quality + output folder
+        options_card = QFrame()
+        options_card.setObjectName("card")
+        options_layout = QVBoxLayout(options_card)
+        options_layout.setSpacing(10)
+
         quality_row = QHBoxLayout()
         quality_row.addWidget(QLabel("Quality:"))
         self.quality_combo = QComboBox()
         self.quality_combo.setEnabled(False)
         quality_row.addWidget(self.quality_combo, stretch=1)
-        layout.addLayout(quality_row)
+        options_layout.addLayout(quality_row)
 
-        # Output folder row
         folder_row = QHBoxLayout()
         folder_row.addWidget(QLabel("Save to:"))
         self.folder_input = QLineEdit(self.output_dir)
         self.folder_input.setReadOnly(True)
         browse_button = QPushButton("Browse...")
+        browse_button.setObjectName("browseButton")
+        browse_button.setCursor(Qt.PointingHandCursor)
         browse_button.clicked.connect(self.on_browse_clicked)
         folder_row.addWidget(self.folder_input, stretch=1)
         folder_row.addWidget(browse_button)
-        layout.addLayout(folder_row)
+        options_layout.addLayout(folder_row)
+
+        layout.addWidget(options_card)
 
         # Action buttons row
         action_row = QHBoxLayout()
-        self.download_video_button = QPushButton("Download Video")
+        action_row.setSpacing(12)
+        self.download_video_button = QPushButton("⬇  Download Video")
+        self.download_video_button.setObjectName("videoButton")
+        self.download_video_button.setCursor(Qt.PointingHandCursor)
         self.download_video_button.setEnabled(False)
         self.download_video_button.clicked.connect(lambda: self.start_download("video"))
-        self.download_audio_button = QPushButton("Download Audio (MP3)")
+        self.download_audio_button = QPushButton("♪  Download Audio (MP3)")
+        self.download_audio_button.setObjectName("audioButton")
+        self.download_audio_button.setCursor(Qt.PointingHandCursor)
         self.download_audio_button.setEnabled(False)
         self.download_audio_button.clicked.connect(lambda: self.start_download("audio"))
         action_row.addWidget(self.download_video_button)
@@ -104,15 +136,59 @@ class MainWindow(QMainWindow):
 
         layout.addStretch(1)
 
-        # Dark mode toggle
-        self.dark_mode_checkbox = QCheckBox("Dark mode")
-        self.dark_mode_checkbox.toggled.connect(self._apply_theme)
-        layout.addWidget(self.dark_mode_checkbox, alignment=Qt.AlignRight)
+    def _build_header(self) -> QFrame:
+        header = QFrame()
+        header.setObjectName("headerBar")
+        header.setFixedHeight(56)
+        header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(16, 8, 16, 8)
+        header_layout.setSpacing(10)
+
+        icon_label = QLabel()
+        icon_label.setPixmap(QPixmap(ICON_PATH).scaled(30, 30, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        header_layout.addWidget(icon_label)
+
+        title = QLabel("YT Downloader")
+        title.setObjectName("headerTitle")
+        header_layout.addWidget(title)
+
+        header_layout.addStretch(1)
+
+        self.theme_button = QToolButton()
+        self.theme_button.setObjectName("headerIconButton")
+        self.theme_button.setCursor(Qt.PointingHandCursor)
+        self.theme_button.setToolTip("Toggle dark mode")
+        self.theme_button.clicked.connect(self.on_theme_toggle_clicked)
+        header_layout.addWidget(self.theme_button)
+
+        settings_button = QToolButton()
+        settings_button.setObjectName("headerIconButton")
+        settings_button.setText("⚙")
+        settings_button.setCursor(Qt.PointingHandCursor)
+        settings_button.setToolTip("Preferences")
+        settings_button.clicked.connect(self.on_preferences_clicked)
+        header_layout.addWidget(settings_button)
+
+        return header
 
     # -- Theme -------------------------------------------------------------
 
-    def _apply_theme(self, dark_mode: bool) -> None:
-        self.setStyleSheet(stylesheet_for(dark_mode))
+    def _apply_theme(self) -> None:
+        self.setStyleSheet(stylesheet_for(self.dark_mode))
+        self.theme_button.setText("☀" if self.dark_mode else "☾")
+
+    def on_theme_toggle_clicked(self) -> None:
+        self.dark_mode = not self.dark_mode
+        save_dark_mode(self.dark_mode)
+        self._apply_theme()
+
+    def on_preferences_clicked(self) -> None:
+        dialog = PreferencesDialog(self)
+        if dialog.exec():
+            self.output_dir = load_output_dir()
+            self.folder_input.setText(self.output_dir)
+            self.dark_mode = load_dark_mode()
+            self._apply_theme()
 
     # -- Fetch formats -------------------------------------------------------
 
