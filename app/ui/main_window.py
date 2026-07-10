@@ -68,7 +68,6 @@ class MainWindow(QMainWindow):
         self.url_input = QLineEdit()
         self.url_input.setPlaceholderText("Paste YouTube URL here...")
         self.fetch_button = QPushButton("Fetch")
-        self.fetch_button.setObjectName("fetchButton")
         self.fetch_button.setCursor(Qt.PointingHandCursor)
         self.fetch_button.clicked.connect(self.on_fetch_clicked)
         url_row.addWidget(self.url_input)
@@ -76,14 +75,18 @@ class MainWindow(QMainWindow):
         layout.addLayout(url_row)
 
         self.title_label = QLabel("")
-        self.title_label.setObjectName("titleLabel")
+        title_font = QFont()
+        title_font.setBold(True)
+        self.title_label.setFont(title_font)
         self.title_label.setWordWrap(True)
         layout.addWidget(self.title_label)
 
         # Options card: quality + output folder
         options_card = QFrame()
-        options_card.setObjectName("card")
+        options_card.setFrameShape(QFrame.StyledPanel)
+        options_card.setFrameShadow(QFrame.Raised)
         options_layout = QVBoxLayout(options_card)
+        options_layout.setContentsMargins(12, 12, 12, 12)
         options_layout.setSpacing(10)
 
         quality_row = QHBoxLayout()
@@ -98,7 +101,6 @@ class MainWindow(QMainWindow):
         self.folder_input = QLineEdit(self.output_dir)
         self.folder_input.setReadOnly(True)
         browse_button = QPushButton("Browse...")
-        browse_button.setObjectName("browseButton")
         browse_button.setCursor(Qt.PointingHandCursor)
         browse_button.clicked.connect(self.on_browse_clicked)
         folder_row.addWidget(self.folder_input, stretch=1)
