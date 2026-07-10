@@ -324,11 +324,20 @@ class MainWindow(QMainWindow):
             self.progress_bar.setValue(percent)
         self.status_label.setText(text)
 
-    def on_download_finished(self, filepath: str) -> None:
+    def on_download_finished(self, result: DownloadResult) -> None:
         self._set_controls_enabled(True)
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(100)
-        self.status_label.setText(f"Done: {os.path.basename(filepath)}")
+        self.status_label.setText(f"Done: {os.path.basename(result.filepath)}")
+
+        record = {
+            "title": result.title,
+            "filepath": result.filepath,
+            "thumbnail_path": result.thumbnail_path,
+            "mode": result.mode,
+        }
+        history = add_to_history(record)
+        self._refresh_downloads_list(history)
 
     def on_download_failed(self, message: str) -> None:
         self._set_controls_enabled(True)
