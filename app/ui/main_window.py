@@ -201,6 +201,26 @@ class MainWindow(QMainWindow):
 
         return header
 
+    # -- Downloads history -------------------------------------------------
+
+    def _clear_downloads_layout(self) -> None:
+        while self.downloads_list_layout.count() > 1:  # keep the trailing stretch
+            item = self.downloads_list_layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+
+    def _refresh_downloads_list(self, history: list[dict]) -> None:
+        self._clear_downloads_layout()
+        if not history:
+            placeholder = QLabel("No downloads yet — completed downloads will appear here.")
+            placeholder.setAlignment(Qt.AlignCenter)
+            self.downloads_list_layout.insertWidget(0, placeholder)
+            return
+        for record in history:
+            item_widget = DownloadItemWidget(record)
+            self.downloads_list_layout.insertWidget(self.downloads_list_layout.count() - 1, item_widget)
+
     # -- Theme -------------------------------------------------------------
 
     def _apply_theme(self) -> None:
