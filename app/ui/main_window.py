@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import os
 
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont, QIcon, QPixmap
 from PySide6.QtWidgets import (
+    QApplication,
     QComboBox,
     QFileDialog,
     QFrame,
@@ -16,7 +17,6 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QPushButton,
-    QSizePolicy,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
 
 from app.core.downloader import DownloadWorker, FetchFormatsWorker, FormatOption
 from app.ui.preferences_dialog import PreferencesDialog, load_dark_mode, load_output_dir, save_dark_mode
-from app.ui.theme import stylesheet_for
+from app.ui.theme import apply_theme
 
 RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "..", "resources")
 ICON_PATH = os.path.join(RESOURCES_DIR, "icon.png")
