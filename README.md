@@ -13,7 +13,7 @@ look (no hand-written stylesheets).
 - Download audio only (converted to MP3 via ffmpeg)
 - Choose the output folder
 - Live download progress
-- Dark mode toggle
+- Dark/light Material Design theme toggle (via `qt-material`)
 - Preferences (default save folder, default theme) — persisted between runs
 - Proper app icon and menu/dock entry, with "New Window" and "Preferences" quick actions
 
