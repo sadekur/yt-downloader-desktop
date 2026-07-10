@@ -7,7 +7,8 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from app.ui.main_window import MainWindow
-from app.ui.preferences_dialog import PreferencesDialog
+from app.ui.preferences_dialog import PreferencesDialog, load_dark_mode
+from app.ui.theme import apply_theme
 
 ICON_PATH = os.path.join(os.path.dirname(__file__), "app", "resources", "icon.png")
 
