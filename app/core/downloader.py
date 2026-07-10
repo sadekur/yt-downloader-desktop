@@ -133,7 +133,7 @@ class DownloadWorker(QThread):
     """Downloads video or audio for a URL into an output directory."""
 
     progress = Signal(int, str)  # percent (0-100, -1 = indeterminate), status text
-    finished_ok = Signal(str)  # output file path
+    finished_ok = Signal(object)  # DownloadResult
     failed = Signal(str)
 
     def __init__(
