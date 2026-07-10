@@ -1,10 +1,12 @@
 """yt-dlp integration: format discovery and download workers."""
 from __future__ import annotations
 
+import os
+import urllib.request
 from dataclasses import dataclass
 
 import yt_dlp
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QStandardPaths, QThread, Signal
 
 
 @dataclass
@@ -13,6 +15,35 @@ class FormatOption:
     label: str
     ext: str
     is_audio_only: bool
+
+
+@dataclass
+class DownloadResult:
+    title: str
+    filepath: str
+    thumbnail_path: str  # local cached path, "" if unavailable
+    mode: str  # "video" or "audio"
+
+
+def _thumbnail_cache_dir() -> str:
+    base = QStandardPaths.writableLocation(QStandardPaths.CacheLocation) or "/tmp"
+    cache_dir = os.path.join(base, "thumbnails")
+    os.makedirs(cache_dir, exist_ok=True)
+    return cache_dir
+
+
+def _cache_thumbnail(url: str | None, video_id: str) -> str:
+    if not url or not video_id:
+        return ""
+    ext = os.path.splitext(url.split("?")[0])[1] or ".jpg"
+    dest = os.path.join(_thumbnail_cache_dir(), f"{video_id}{ext}")
+    if os.path.exists(dest):
+        return dest
+    try:
+        urllib.request.urlretrieve(url, dest)
+    except Exception:
+        return ""
+    return dest
 
 
 def _human_size(num_bytes: float | None) -> str:
