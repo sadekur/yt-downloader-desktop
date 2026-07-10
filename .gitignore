@@ -1,0 +1,14 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Downloaded videos (output of this tool, not source code)
+downloads/
+
+# OS/editor cruft
+.DS_Store
+*.swp
+CLAUDE.md
