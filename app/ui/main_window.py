@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("YT Downloader")
         self.setWindowIcon(QIcon(ICON_PATH))
-        self.resize(620, 420)
+        self.resize(640, 640)
 
         self.output_dir = load_output_dir()
         self.dark_mode = load_dark_mode()
