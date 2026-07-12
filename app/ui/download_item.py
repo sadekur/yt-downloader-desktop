@@ -85,7 +85,16 @@ class DownloadItemWidget(QFrame):
         super().mousePressEvent(event)
 
     def _on_delete_clicked(self) -> None:
-        self.delete_requested.emit(self.record)
+        reply = QMessageBox.question(
+            self,
+            "Remove download",
+            f"Remove \"{self.record.get('title', 'this item')}\" from your recent downloads?\n\n"
+            "This only removes it from the list — the downloaded file itself is not deleted.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply == QMessageBox.Yes:
+            self.delete_requested.emit(self.record)
 
     def _open_folder(self) -> None:
         folder = os.path.dirname(self.record.get("filepath", ""))
