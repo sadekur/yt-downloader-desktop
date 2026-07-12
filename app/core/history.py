@@ -27,3 +27,9 @@ def add_to_history(record: dict) -> list[dict]:
     history = history[:MAX_HISTORY]
     _settings().setValue("download_history", json.dumps(history))
     return history
+
+
+def remove_from_history(filepath: str) -> list[dict]:
+    history = [record for record in load_history() if record.get("filepath") != filepath]
+    _settings().setValue("download_history", json.dumps(history))
+    return history
