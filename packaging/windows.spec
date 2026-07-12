@@ -3,6 +3,7 @@
 # from the project root (see scripts/build_windows.bat). Must be run on
 # Windows — PyInstaller does not cross-compile.
 import glob
+import importlib.util
 import os
 
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
