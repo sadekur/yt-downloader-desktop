@@ -72,10 +72,20 @@ class DownloadItemWidget(QFrame):
         open_hint.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         layout.addWidget(open_hint)
 
+        delete_button = QToolButton()
+        delete_button.setText("🗑")
+        delete_button.setCursor(Qt.PointingHandCursor)
+        delete_button.setToolTip("Remove from history")
+        delete_button.clicked.connect(self._on_delete_clicked)
+        layout.addWidget(delete_button)
+
     def mousePressEvent(self, event) -> None:
         if event.button() == Qt.LeftButton:
             self._open_folder()
         super().mousePressEvent(event)
+
+    def _on_delete_clicked(self) -> None:
+        self.delete_requested.emit(self.record)
 
     def _open_folder(self) -> None:
         folder = os.path.dirname(self.record.get("filepath", ""))
