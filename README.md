@@ -150,13 +150,20 @@ main.py                          # entry point (supports --preferences flag)
 app/
   core/
     downloader.py                # yt-dlp integration (format lookup + download workers)
+    history.py                   # recent-downloads persistence (QSettings)
   ui/
     main_window.py               # main window / widgets
+    download_item.py             # one row in the Recent Downloads list
     preferences_dialog.py        # Preferences dialog (QSettings-backed)
     theme.py                     # applies qt-material Material Design themes
   resources/
-    icon.png, icon-*.png         # app icon at various sizes
+    icon.png, icon-*.png, icon.ico  # app icon at various sizes (.ico for Windows)
 scripts/
-  generate_icon.py               # regenerates the app icon
+  generate_icon.py               # regenerates the app icon (incl. icon.ico)
   install_desktop_entry.sh       # installs the Linux app-menu/dock launcher
+  build_windows.bat              # builds dist\YT Downloader.exe (run on Windows)
+packaging/
+  windows.spec                   # PyInstaller spec used by build_windows.bat
+requirements.txt                 # runtime dependencies
+requirements-build.txt           # + PyInstaller, for building the Windows .exe
 ```
