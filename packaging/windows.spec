@@ -51,10 +51,26 @@ def _pyside6_plugin_binaries() -> list[tuple[str, str]]:
     return entries
 
 
+def _bundled_ffmpeg_binaries() -> list[tuple[str, str]]:
+    # Fetched by scripts/fetch_ffmpeg_windows.ps1 (not checked into git --
+    # see .gitignore). Destination "ffmpeg/" matches
+    # app/core/downloader.py's _bundled_ffmpeg_dir(), so yt-dlp uses this
+    # copy directly instead of requiring users to install ffmpeg themselves.
+    vendor_dir = os.path.join(PROJECT_ROOT, "vendor", "ffmpeg-windows")
+    ffmpeg_exe = os.path.join(vendor_dir, "ffmpeg.exe")
+    ffprobe_exe = os.path.join(vendor_dir, "ffprobe.exe")
+    if not (os.path.exists(ffmpeg_exe) and os.path.exists(ffprobe_exe)):
+        raise SystemExit(
+            "vendor/ffmpeg-windows/{ffmpeg,ffprobe}.exe not found. "
+            "Run scripts\\fetch_ffmpeg_windows.ps1 first."
+        )
+    return [(ffmpeg_exe, "ffmpeg"), (ffprobe_exe, "ffmpeg")]
+
+
 a = Analysis(
     [os.path.join(PROJECT_ROOT, "main.py")],
     pathex=[PROJECT_ROOT],
-    binaries=_pyside6_plugin_binaries(),
+    binaries=_pyside6_plugin_binaries() + _bundled_ffmpeg_binaries(),
     datas=[
         (os.path.join(PROJECT_ROOT, "app", "resources"), os.path.join("app", "resources")),
         *collect_data_files("qt_material"),
