@@ -219,7 +219,12 @@ class MainWindow(QMainWindow):
             return
         for record in history:
             item_widget = DownloadItemWidget(record)
+            item_widget.delete_requested.connect(self.on_delete_download)
             self.downloads_list_layout.insertWidget(self.downloads_list_layout.count() - 1, item_widget)
+
+    def on_delete_download(self, record: dict) -> None:
+        history = remove_from_history(record.get("filepath", ""))
+        self._refresh_downloads_list(history)
 
     # -- Theme -------------------------------------------------------------
 
