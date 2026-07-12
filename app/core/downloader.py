@@ -2,11 +2,26 @@
 from __future__ import annotations
 
 import os
+import sys
 import urllib.request
 from dataclasses import dataclass
 
 import yt_dlp
 from PySide6.QtCore import QStandardPaths, QThread, Signal
+
+
+def _bundled_ffmpeg_dir() -> str | None:
+    """Directory holding a bundled ffmpeg/ffprobe when frozen via PyInstaller.
+
+    The Windows build embeds ffmpeg.exe/ffprobe.exe under an "ffmpeg/" folder
+    (see packaging/windows.spec) so end users don't need to install ffmpeg
+    themselves. In dev mode (not frozen), yt-dlp falls back to PATH as usual.
+    """
+    if not getattr(sys, "frozen", False):
+        return None
+    candidate = os.path.join(sys._MEIPASS, "ffmpeg")
+    exe_name = "ffmpeg.exe" if os.name == "nt" else "ffmpeg"
+    return candidate if os.path.exists(os.path.join(candidate, exe_name)) else None
 
 
 @dataclass
