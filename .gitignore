@@ -15,6 +15,10 @@ dist/
 !packaging/windows.spec
 *.egg-info/
 
+# Third-party binaries fetched at build time, not checked in (~200MB) --
+# see scripts/fetch_ffmpeg_windows.sh / .bat
+vendor/
+
 # Downloaded videos (output of this tool, not source code)
 downloads/
 
