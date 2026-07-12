@@ -12,6 +12,7 @@ __pycache__/
 build/
 dist/
 *.spec
+!packaging/windows.spec
 *.egg-info/
 
 # Downloaded videos (output of this tool, not source code)

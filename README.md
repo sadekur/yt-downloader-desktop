@@ -92,6 +92,47 @@ winget install Gyan.FFmpeg
 No YouTube login, API key, or payment is required — everything runs locally
 using `yt-dlp` and `ffmpeg`.
 
+## Building a standalone Windows .exe (for users without Python)
+
+If you want to hand this app to other Windows users the same way Linux users
+get it via `install_desktop_entry.sh` — i.e. without them installing Python
+or any dependencies — package it into a single `.exe` with PyInstaller.
+
+**This must be done on a Windows machine** (PyInstaller does not
+cross-compile; a Linux/macOS build only produces a Linux/macOS binary).
+
+1. On Windows, clone the repo and set up a venv:
+
+   ```bat
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install -r requirements.txt -r requirements-build.txt
+   ```
+
+2. Build:
+
+   ```bat
+   scripts\build_windows.bat
+   ```
+
+   This runs PyInstaller against `packaging\windows.spec`, which bundles the
+   app resources (icons) and `qt-material`'s theme/font data, and sets the
+   `.exe` icon from `app/resources/icon.ico`.
+
+3. The result is `dist\YT Downloader.exe` — a single file. Send that file to
+   other Windows users; they can just double-click it, no install needed.
+
+**ffmpeg is still required on the target machine and is *not* bundled into
+the .exe** (same requirement as running from source — see Requirements
+above). Windows users without it should run:
+
+```bat
+winget install Gyan.FFmpeg
+```
+
+or download a static build from [ffmpeg.org](https://ffmpeg.org/) and add it
+to `PATH`.
+
 ## Troubleshooting
 
 - **"Fetch failed" / no formats show up** — check your internet connection,
