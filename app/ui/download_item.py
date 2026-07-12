@@ -25,6 +25,8 @@ def _load_thumbnail(path: str) -> QPixmap | None:
 class DownloadItemWidget(QFrame):
     """Clickable card showing a completed download; click anywhere to open its folder."""
 
+    delete_requested = Signal(dict)  # emits this widget's record
+
     def __init__(self, record: dict, parent=None):
         super().__init__(parent)
         self.record = record
