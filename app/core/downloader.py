@@ -190,6 +190,10 @@ class DownloadWorker(QThread):
             "progress_hooks": [self._progress_hook],
         }
 
+        ffmpeg_dir = _bundled_ffmpeg_dir()
+        if ffmpeg_dir:
+            ydl_opts["ffmpeg_location"] = ffmpeg_dir
+
         if self.mode == "audio":
             ydl_opts["format"] = "bestaudio/best"
             ydl_opts["postprocessors"] = [
