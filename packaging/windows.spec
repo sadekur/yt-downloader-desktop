@@ -25,9 +25,17 @@ def _pyside6_plugin_binaries() -> list[tuple[str, str]]:
     # locate the plugins directory that way and copy the DLLs in ourselves.
     # Destination mirrors what PyInstaller's runtime hook expects at launch:
     # QT_PLUGIN_PATH = <bundle>/PySide6/plugins.
-    import PySide6
+    #
+    # Use find_spec rather than `import PySide6` — actually importing it
+    # here would leave "PySide6" in sys.modules for the rest of this
+    # process, which later trips up qt_material's own hook (it checks
+    # `"PySide6" in sys.modules` and then does a real `from PySide6.QtGui
+    # import ...`, which would hit the same icuuc.dll failure and abort
+    # the build).
+    spec = importlib.util.find_spec("PySide6")
+    package_dir = os.path.dirname(spec.origin)
 
-    plugins_dir = os.path.join(os.path.dirname(PySide6.__file__), "plugins")
+    plugins_dir = os.path.join(package_dir, "plugins")
     categories = [
         "platforms",  # required — qwindows.dll; app can't start without it
         "styles",
