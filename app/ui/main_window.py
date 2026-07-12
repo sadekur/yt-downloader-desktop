@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.core.downloader import DownloadResult, DownloadWorker, FetchFormatsWorker, FormatOption
-from app.core.history import add_to_history, load_history
+from app.core.history import add_to_history, load_history, remove_from_history
 from app.ui.download_item import DownloadItemWidget
 from app.ui.preferences_dialog import PreferencesDialog, load_dark_mode, load_output_dir, save_dark_mode
 from app.ui.theme import apply_theme
