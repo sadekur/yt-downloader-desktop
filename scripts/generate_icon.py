@@ -103,6 +103,11 @@ def main() -> None:
     draw_icon(256).save(os.path.join(OUT_DIR, "icon.png"), "PNG")
     print("wrote icon.png (256px)")
 
+    # Windows .exe icon (used by scripts/build_windows.bat / PyInstaller --icon)
+    ico_path = os.path.join(OUT_DIR, "icon.ico")
+    draw_icon(256).save(ico_path, "ICO")
+    print(f"wrote {ico_path}")
+
 
 if __name__ == "__main__":
     main()
