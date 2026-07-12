@@ -72,48 +72,49 @@ def _human_size(num_bytes: float | None) -> str:
     return f"{size:.1f}TB"
 
 
+# Standard quality ladder shown in the UI, highest first. Raw formats are
+# snapped to the nearest rung here rather than listed as-is, since a video
+# typically has many near-duplicate formats (different codecs/bitrates/fps
+# per resolution) that aren't a meaningful choice for most users.
+_STANDARD_HEIGHTS = [2160, 1440, 1080, 720, 480, 360, 240, 144]
+
+
 def _build_format_options(info: dict) -> list[FormatOption]:
-    options: list[FormatOption] = []
-    seen_labels: set[str] = set()
+    best_by_height: dict[int, dict] = {}
 
     for fmt in info.get("formats", []):
-        vcodec = fmt.get("vcodec")
-        acodec = fmt.get("acodec")
-        if vcodec == "none" and acodec == "none":
+        height = fmt.get("height")
+        if fmt.get("vcodec") == "none" or not height:
             continue
 
-        is_audio_only = vcodec == "none"
-        size = fmt.get("filesize") or fmt.get("filesize_approx")
-        size_label = _human_size(size)
+        bucket = min(_STANDARD_HEIGHTS, key=lambda h: abs(h - height))
+        if abs(bucket - height) > 40:
+            continue  # not close enough to a standard resolution to show
 
-        if is_audio_only:
-            abr = fmt.get("abr")
-            label = f"Audio only - {fmt.get('ext', '')}"
-            if abr:
-                label += f" ({round(abr)}kbps)"
-        else:
-            height = fmt.get("height")
-            fps = fmt.get("fps")
-            label = f"{height}p" if height else fmt.get("format_note", "video")
-            if fps and fps > 30:
-                label += f"{round(fps)}"
-            label += f" - {fmt.get('ext', '')}"
-            if acodec == "none":
-                label += " (no audio)"
-
-        if size_label:
-            label += f" - {size_label}"
-
-        if label in seen_labels:
+        current = best_by_height.get(bucket)
+        if current is None:
+            best_by_height[bucket] = fmt
             continue
-        seen_labels.add(label)
 
+        # Prefer mp4 sources (matches merge_output_format="mp4" on download);
+        # otherwise prefer the higher-bitrate format at the same resolution.
+        ext, current_ext = fmt.get("ext", ""), current.get("ext", "")
+        if ext == "mp4" and current_ext != "mp4":
+            best_by_height[bucket] = fmt
+        elif ext == current_ext and (fmt.get("tbr") or 0) > (current.get("tbr") or 0):
+            best_by_height[bucket] = fmt
+
+    options = []
+    for height in _STANDARD_HEIGHTS:
+        fmt = best_by_height.get(height)
+        if fmt is None:
+            continue
         options.append(
             FormatOption(
                 format_id=fmt["format_id"],
-                label=label,
+                label=f"{height}p - {fmt.get('ext', '')}",
                 ext=fmt.get("ext", ""),
-                is_audio_only=is_audio_only,
+                is_audio_only=False,
             )
         )
 
