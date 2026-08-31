@@ -26,6 +26,12 @@ if not exist "%VENV_PYTHON%" (
     exit /b 1
 )
 
+REM yt-dlp ships frequent breaking-fix releases for YouTube-side changes; an
+REM existing venv reused across builds can be months stale even though
+REM requirements.txt's ">=" is satisfied, so force it to latest here.
+"%VENV_PYTHON%" -m pip install --upgrade yt-dlp
+if errorlevel 1 exit /b 1
+
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\fetch_ffmpeg_windows.ps1
 if errorlevel 1 exit /b 1
 
