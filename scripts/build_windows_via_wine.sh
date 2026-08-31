@@ -51,6 +51,10 @@ fi
 echo "== Installing/upgrading Python dependencies =="
 run_wine "wine '$WINE_PYTHON' -m pip install --upgrade pip -q"
 run_wine "cd '$PROJECT_ROOT' && wine '$WINE_PYTHON' -m pip install -r requirements.txt -r requirements-build.txt -q"
+# yt-dlp ships frequent breaking-fix releases for YouTube-side changes; a
+# reused Wine prefix from an earlier build can be months stale even though
+# requirements.txt's ">=" is satisfied, so force it to latest on every build.
+run_wine "wine '$WINE_PYTHON' -m pip install --upgrade yt-dlp -q"
 
 echo "== Fetching bundled ffmpeg =="
 "$PROJECT_ROOT/scripts/fetch_ffmpeg_windows.sh"
