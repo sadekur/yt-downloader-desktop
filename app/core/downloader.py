@@ -189,6 +189,11 @@ class DownloadWorker(QThread):
             "no_warnings": True,
             "outtmpl": outtmpl,
             "progress_hooks": [self._progress_hook],
+            # googlevideo.com throttles per-connection throughput; splitting
+            # each format into chunks and fetching them concurrently gets
+            # several times the speed of a single-connection download.
+            "concurrent_fragment_downloads": 8,
+            "http_chunk_size": 10 * 1024 * 1024,
         }
 
         ffmpeg_dir = _bundled_ffmpeg_dir()
