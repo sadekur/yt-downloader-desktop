@@ -97,12 +97,21 @@ def _build_format_options(info: dict) -> list[FormatOption]:
             continue
 
         # Prefer mp4 sources (matches merge_output_format="mp4" on download);
-        # otherwise prefer the higher-bitrate format at the same resolution.
+        # then prefer direct HTTP/DASH over HLS (m3u8) at the same
+        # resolution, since HLS bitrate figures are unreliable estimates
+        # that often overstate size for no visual-quality gain, and HLS's
+        # segmented playlist fetch adds overhead that direct/DASH avoids;
+        # otherwise prefer the higher-bitrate format.
         ext, current_ext = fmt.get("ext", ""), current.get("ext", "")
+        is_hls = "m3u8" in (fmt.get("protocol") or "")
+        current_is_hls = "m3u8" in (current.get("protocol") or "")
         if ext == "mp4" and current_ext != "mp4":
             best_by_height[bucket] = fmt
-        elif ext == current_ext and (fmt.get("tbr") or 0) > (current.get("tbr") or 0):
-            best_by_height[bucket] = fmt
+        elif ext == current_ext:
+            if current_is_hls and not is_hls:
+                best_by_height[bucket] = fmt
+            elif is_hls == current_is_hls and (fmt.get("tbr") or 0) > (current.get("tbr") or 0):
+                best_by_height[bucket] = fmt
 
     options = []
     for height in _STANDARD_HEIGHTS:
