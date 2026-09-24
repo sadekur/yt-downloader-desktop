@@ -196,6 +196,7 @@ class DownloadWorker(QThread):
         ydl_opts: dict = {
             "quiet": True,
             "no_warnings": True,
+            "noplaylist": True,
             "outtmpl": outtmpl,
             "progress_hooks": [self._progress_hook],
             # googlevideo.com throttles per-connection throughput; splitting
