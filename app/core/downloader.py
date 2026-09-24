@@ -142,7 +142,7 @@ class FetchFormatsWorker(QThread):
 
     def run(self) -> None:
         try:
-            ydl_opts = {"quiet": True, "no_warnings": True, "skip_download": True}
+            ydl_opts = {"quiet": True, "no_warnings": True, "skip_download": True, "noplaylist": True}
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(self.url, download=False)
         except Exception as exc:  # yt_dlp raises various DownloadError subclasses
